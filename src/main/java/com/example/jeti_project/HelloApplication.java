@@ -15,6 +15,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+    private double xOffset = 0;
+    private double yOffset = 0;
+
+    private Rectangle unitSquare; // Un seul rectangle pour l'unité
     @Override
     public void start(Stage primaryStage) {
         GridPane gridPane = new GridPane();
@@ -51,6 +55,19 @@ public class HelloApplication extends Application {
     private Rectangle createUnitSquare() {
         Rectangle unitSquare = new Rectangle(25, 25);
         unitSquare.setFill(Color.BLUE);
+
+        // Ajouter un gestionnaire d'événements pour le déplacement
+        unitSquare.setOnMousePressed(event -> {
+            xOffset = event.getSceneX() - unitSquare.getTranslateX();
+            yOffset = event.getSceneY() - unitSquare.getTranslateY();
+        });
+
+        unitSquare.setOnMouseDragged(event -> {
+            double newX = event.getSceneX() - xOffset;
+            double newY = event.getSceneY() - yOffset;
+            unitSquare.setTranslateX(newX);
+            unitSquare.setTranslateY(newY);
+        });
         return unitSquare;
     }
     private Rectangle createBoardGame(){
