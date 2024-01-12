@@ -5,6 +5,7 @@ public class Unite {
     private int vie;
     private int attaque;
     private int defense;
+    private int numero;
 
     public Unite(String nom, int vie, int attaque, int defense) {
         this.nom = nom;
@@ -45,10 +46,18 @@ public class Unite {
         this.defense = defense;
     }
 
+    public int getNumero() {
+        return numero;
+    }
+
+    public void setNumero(int numero) {
+        this.numero = numero;
+    }
+
     public void attaquer(Unite ennemie){
         int degat = 0;
         degat = this.attaque - ennemie.getDefense();
-        if (this.faiblesse(ennemie)){
+        if (ennemie.faiblesse(this)){
             degat = degat * 2;
         }
         int trueDamage = (degat < 0) ? 0 : degat;
@@ -68,11 +77,20 @@ public class Unite {
     }
 
     public boolean estMort(){
-        boolean mort = this.vie <= 0 ? true : false;
-        return mort;
+        return this.vie <= 0 ? true : false;
     }
 
-    public void appliquerTerrain(Case case){
-
+    public void appliquerTerrain(Case position){
+        switch (position.getNom()){
+            case "foret":
+                this.defense++;
+                break;
+            case "desert":
+                //moins de déplacement
+                break;
+            case "fort":
+                defense += 2;
+                break;
+        }
     }
 }
