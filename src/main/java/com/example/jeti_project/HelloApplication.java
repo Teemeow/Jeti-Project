@@ -15,13 +15,9 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
-    private double xOffset = 0;
-    private double yOffset = 0;
     @Override
     public void start(Stage primaryStage) {
         GridPane gridPane = new GridPane();
-
-
         // Définir les contraintes de colonne et de ligne
         for (int i = 0; i < 7; i++) {
             ColumnConstraints column = new ColumnConstraints();
@@ -34,26 +30,14 @@ public class HelloApplication extends Application {
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
                 Pane pane = new Pane();
-                Rectangle rectangle = new Rectangle(230, 230); // Créer un rectangle de 230x230 pixels
-                rectangle.setFill(Color.TRANSPARENT);
+                Rectangle boardGame = createBoardGame();
 
                 Rectangle unitSquare = createUnitSquare();
 
-                // Ajouter un gestionnaire d'événements pour le déplacement
-                unitSquare.setOnMousePressed(event -> {
-                    xOffset = event.getSceneX() - unitSquare.getTranslateX();
-                    yOffset = event.getSceneY() - unitSquare.getTranslateY();
-                });
 
-                unitSquare.setOnMouseDragged(event -> {
-                    unitSquare.setTranslateX(event.getSceneX() - xOffset);
-                    unitSquare.setTranslateY(event.getSceneY() - yOffset);
-                });
 
-                // Ajouter une bordure noire
-                rectangle.setStroke(Color.BLACK);
-                rectangle.setStrokeWidth(1); // Ajuster la largeur de la bordure
-                pane.getChildren().add(rectangle); // Ajouter le rectangle au pane
+                pane.getChildren().add(unitSquare);
+                pane.getChildren().add(boardGame); // Ajouter le rectangle au pane
 
                 gridPane.add(pane, i, j);
             }
@@ -65,10 +49,21 @@ public class HelloApplication extends Application {
         primaryStage.show();
     }
     private Rectangle createUnitSquare() {
-        Rectangle unitSquare = new Rectangle(50, 50);
+        Rectangle unitSquare = new Rectangle(25, 25);
         unitSquare.setFill(Color.BLUE);
         return unitSquare;
     }
+    private Rectangle createBoardGame(){
+        int side = 100;
+        Rectangle rectangle = new Rectangle( side,side); // Créer un rectangle de 230x230 pixels
+        rectangle.setFill(Color.TRANSPARENT);
+
+        rectangle.setStroke(Color.BLACK); // Mettre la couleur noire au rectangle
+        rectangle.setStrokeWidth(1); // Ajuster la largeur de la bordure
+        return rectangle;
+
+    }
+
     public static void main(String[] args) {
         launch(args);
     }
