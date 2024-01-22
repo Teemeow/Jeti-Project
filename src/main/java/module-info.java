@@ -5,4 +5,5 @@ module com.example.jeti_project {
 
     opens com.example.jeti_project to javafx.fxml;
     exports com.example.jeti_project;
+    exports client;
 }
