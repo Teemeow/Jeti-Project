@@ -25,6 +25,13 @@ public class MainGui extends Application {
         stage.setScene(scene);
         stage.show();
     }
+    public void classement(){
+        Group root = new Group();
+        Scene scene = new Scene(root, 600,600);
+        stage.setTitle("Classement");
+        stage.setScene(scene);
+        stage.show();
+    }
 
     public void plateau(){
         GridPane plateau = new Plateau().initPlateau();
