@@ -8,10 +8,6 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class MainGui extends Application {
-
-    private int tailleCase = 50;
-    private int nbColonnes = 10;
-    private int nbLigne = 10;
     private Stage stage;
     @Override
     public void start(Stage stage) throws Exception {
