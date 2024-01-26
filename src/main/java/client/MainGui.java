@@ -32,8 +32,6 @@ public class MainGui extends Application {
 
     public void plateau(){
         Plateau p = new Plateau(new GridPane());
-        //Unite unite = new Unite("Bob", 1, 2,2,1,"ROUGE", 1,1);
-        //p.placerPion(unite);
 
         GridPane plateau = p.initPlateau();
         Scene scene = new Scene(plateau, 600, 600);

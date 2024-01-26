@@ -33,9 +33,9 @@ public class Plateau extends Parent {
                 setMove(caseJeu, armee);
             }
         }
-        placerPion(unite1);
-        placerPion(unite2);
-        placerPion(unite3);
+        placerUnite(unite1);
+        placerUnite(unite2);
+        placerUnite(unite3);
         return this.plateau;
     }
 
@@ -49,7 +49,7 @@ public class Plateau extends Parent {
         return (ligne + colonne) % 2 == 0 ? Color.WHITE : Color.BLACK;
     }
 
-    public void placerPion(Unite unite){
+    public void placerUnite(Unite unite){
         this.plateau.add(unite.getCircle(), unite.getPositionX(), unite.getPositionY());
         this.plateau.add(unite.getVieText(), unite.getPositionX(), unite.getPositionY());
         unite.updateVieTextPosition();
