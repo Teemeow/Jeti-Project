@@ -1,17 +1,30 @@
 package jeu;
 
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+
 public class Unite {
     private String nom;
     private int vie;
     private int attaque;
     private int defense;
     private int numero;
+    private Color couleur;
+    private int positionX;
+    private int positionY;
 
-    public Unite(String nom, int vie, int attaque, int defense) {
+    private Circle circle;
+
+    public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY) {
         this.nom = nom;
         this.vie = vie;
         this.attaque = attaque;
         this.defense = defense;
+        this.numero = numero;
+        this.couleur = Color.RED;
+        this.positionX = positionX;
+        this.positionY = positionY;
+        this.circle = new Circle(5, this.couleur);
     }
 
     public String getNom() {

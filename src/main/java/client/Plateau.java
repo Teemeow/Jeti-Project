@@ -3,20 +3,20 @@ package client;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import jeu.Case;
+import jeu.Unite;
 
 public class Plateau extends Parent {
-    private Button test;
     private int tailleCase = 50;
     private int nbColonnes = 10;
     private int nbLigne = 10;
+    private GridPane plateau;
 
-    public Plateau(){
-        this.test = new Button("oui");
-        test.setPrefHeight(100);
-        test.setPrefWidth(300);
-        this.getChildren().add(test);
+    public Plateau(GridPane gridPane){
+        this.plateau = gridPane;
     }
 
     public GridPane initPlateau(){
