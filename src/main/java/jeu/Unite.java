@@ -2,6 +2,7 @@ package jeu;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 
 public class Unite {
     private String nom;
@@ -12,6 +13,7 @@ public class Unite {
     private Color couleur;
     private int positionX;
     private int positionY;
+    private Text vieText;
 
     private Circle circle;
 
@@ -24,7 +26,17 @@ public class Unite {
         this.couleur = Color.RED;
         this.positionX = positionX;
         this.positionY = positionY;
-        this.circle = new Circle(5, this.couleur);
+        this.circle = new Circle(25, this.couleur);
+        this.vieText = new Text(String.valueOf(vie));
+        this.vieText.setFill(Color.WHITE);
+    }
+
+    public Text getVieText() {
+        return vieText;
+    }
+
+    public void setVieText(Text vieText) {
+        this.vieText = vieText;
     }
 
     public String getNom() {
@@ -137,5 +149,10 @@ public class Unite {
                 defense += 2;
                 break;
         }
+    }
+
+    public void updateVieTextPosition() {
+        this.vieText.setX(this.positionX * 50); // Ajustez en fonction de la taille de la case
+        this.vieText.setY(this.positionY * 50); // Ajustez en fonction de la taille de la case
     }
 }
