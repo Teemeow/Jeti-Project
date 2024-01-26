@@ -20,14 +20,18 @@ public class Plateau extends Parent {
     }
 
     public GridPane initPlateau(){
-        GridPane plateau = new GridPane();
+
+        Unite unite = new Unite("Bob", 1, 2,2,1,1,1);
         for (int ligne = 0; ligne < nbLigne; ligne++){
             for (int colonne = 0; colonne < nbColonnes; colonne++){
                 Case caseJeu = creerCase(ligne , colonne);
-                plateau.add(caseJeu, colonne, ligne);
+                Circle cercle = new Circle(5, Color.RED);
+                this.plateau.add(caseJeu, colonne, ligne);
+                this.plateau.add(cercle, 2, 4);
             }
         }
-        return plateau;
+        placerPion(unite);
+        return this.plateau;
     }
 
     public Case creerCase(int ligne, int colonne){
@@ -38,5 +42,9 @@ public class Plateau extends Parent {
 
     public Color chooseColor(int ligne, int colonne){
         return (ligne + colonne) % 2 == 0 ? Color.WHITE : Color.BLACK;
+    }
+
+    public void placerPion(Unite unite){
+        this.plateau.add(unite.getCircle(), unite.getPositionX(), unite.getPositionY());
     }
 }
