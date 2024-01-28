@@ -139,7 +139,6 @@ public class Plateau extends Parent {
         }
 
         uniteCible.updateVieTextPosition();
-        System.out.println("Vie après l'attaque bouffon: " + uniteCible.getVie());
         // Réinitialise les sélections et les gestionnaires de clic
         uniteAttaquante = null;
         for (Unite unite : armee.getLesUnites()) {
