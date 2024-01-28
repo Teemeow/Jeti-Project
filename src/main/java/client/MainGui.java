@@ -31,7 +31,9 @@ public class MainGui extends Application {
     }
 
     public void plateau(){
-        GridPane plateau = new Plateau().initPlateau();
+        Plateau p = new Plateau(new GridPane());
+
+        GridPane plateau = p.initPlateau();
         Scene scene = new Scene(plateau, 600, 600);
         stage.setTitle("LE JEU");
         stage.setScene(scene);

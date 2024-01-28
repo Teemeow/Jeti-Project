@@ -3,12 +3,13 @@ package client;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class PlateauGui extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        Plateau plateau = new Plateau();
+        Plateau plateau = new Plateau(new GridPane());
         Group root = new Group();
         root.getChildren().add(plateau);
         Scene scene = new Scene(root, 600, 600);
