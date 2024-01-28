@@ -1,6 +1,7 @@
 package client;
 
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import jeu.Armee;
@@ -13,6 +14,8 @@ public class Plateau extends Parent {
     private int nbLigne = 10;
     private GridPane plateau;
     private Unite uniteChoose;
+    private Unite uniteAttaquante;
+    private Armee armee;
 
     public Plateau(GridPane gridPane){
         this.plateau = gridPane;
@@ -20,9 +23,11 @@ public class Plateau extends Parent {
 
     public GridPane initPlateau(){
         Armee armee = new Armee("T");
-        Unite unite1 = new Unite("Bob", 600, 2,2,1,8,4);
-        Unite unite2 = new Unite("Bob", 4, 2,2,1,2,5);
-        Unite unite3 = new Unite("Bob", 27, 2,2,1,9,3);
+        Unite unite1 = new Unite("Bob", 600, 20,2,1,8,4);
+        Unite unite2 = new Unite("Bob", 4, 20,2,1,2,5);
+        Armee armee2 = new Armee("B");
+        Unite unite3 = new Unite("Bob", 27, 20,2,1,9,3);
+        this.armee = armee;
         armee.ajouterUnite(unite1);
         armee.ajouterUnite(unite2);
         armee.ajouterUnite(unite3);
@@ -36,7 +41,10 @@ public class Plateau extends Parent {
         placerUnite(unite1);
         placerUnite(unite2);
         placerUnite(unite3);
-        return this.plateau;
+        Button attaqueButton = new Button("Attaquer");
+        attaqueButton.setOnAction(event -> handleAttaqueButtonClick());
+        this.plateau.add(attaqueButton, nbColonnes, nbLigne);
+    return this.plateau;
     }
 
     public Case creerCase(int ligne, int colonne){
@@ -66,6 +74,7 @@ public class Plateau extends Parent {
 
     public void handleCaseClick(Case caseJeu, Unite unite){
         if(this.uniteChoose != null){
+            this.uniteChoose.deplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
             // Déplace l'unité vers la nouvelle case
             this.plateau.getChildren().remove(this.uniteChoose.getCircle());
             this.plateau.add(this.uniteChoose.getCircle(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
@@ -90,6 +99,52 @@ public class Plateau extends Parent {
         for (Unite unite: armee.getLesUnites()){
             caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu, unite));
             unite.getCircle().setOnMouseClicked(even -> handleUniteClick(unite));
+        }
+    }
+
+    public void handleAttaqueButtonClick() {
+        if (uniteAttaquante != null) {
+            // L'unité attaquante a déjà été choisie, permet à l'utilisateur de choisir l'unité cible
+            for (Unite unite : armee.getLesUnites()) {
+                unite.getCircle().setStroke(Color.BLACK);
+                unite.getCircle().setOnMouseClicked(event -> handleUniteCibleClick(unite));
+            }
+        } else {
+            // Aucune unité attaquante n'a été choisie, permet à l'utilisateur de choisir l'unité attaquante
+            for (Unite unite : armee.getLesUnites()) {
+                unite.getCircle().setStroke(Color.GREEN);
+                unite.getCircle().setOnMouseClicked(event -> handleUniteAttaquanteClick(unite));
+            }
+        }
+    }
+
+    private void handleUniteAttaquanteClick(Unite unite) {
+        unite.getCircle().setStroke(null); // Annule la sélection de l'unité précédente (si applicable)
+        uniteAttaquante = unite;
+        // Désactive la possibilité de choisir cette unité à nouveau
+        unite.getCircle().setOnMouseClicked(null);
+    }
+
+    private void handleUniteCibleClick(Unite uniteCible) {
+        uniteCible.getCircle().setStroke(null); // Annule la sélection de l'unité cible précédente (si applicable)
+
+        // Effectuez l'attaque avec l'unité attaquante et l'unité cible
+        uniteAttaquante.attaquer(uniteCible);
+        int positionX = uniteCible.getPositionX();
+        int positionY = uniteCible.getPositionY();
+
+        // Assurez-vous que la positionX et positionY sont valides
+        if (positionX >= 0 && positionX < nbColonnes && positionY >= 0 && positionY < nbLigne) {
+            uniteCible.deplacer(positionX, positionY);
+        }
+
+        uniteCible.updateVieTextPosition();
+        System.out.println("Vie après l'attaque bouffon: " + uniteCible.getVie());
+        // Réinitialise les sélections et les gestionnaires de clic
+        uniteAttaquante = null;
+        for (Unite unite : armee.getLesUnites()) {
+            unite.getCircle().setStroke(null);
+            unite.getCircle().setOnMouseClicked(event -> handleUniteClick(unite));
         }
     }
 }

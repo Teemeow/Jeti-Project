@@ -14,7 +14,6 @@ public class Unite {
     private int positionX;
     private int positionY;
     private Text vieText;
-
     private Circle circle;
 
     public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY) {
@@ -53,6 +52,7 @@ public class Unite {
 
     public void setVie(int vie) {
         this.vie = vie;
+        this.vieText.setText(String.valueOf(vie));
     }
 
     public int getAttaque() {
@@ -117,7 +117,7 @@ public class Unite {
         if (ennemie.faiblesse(this)){
             degat = degat * 2;
         }
-        int trueDamage = (degat < 0) ? 0 : degat;
+        int trueDamage = Math.max(degat, 0);
         ennemie.perdreVie(trueDamage);
     }
 
@@ -151,6 +151,10 @@ public class Unite {
         }
     }
 
+    public void deplacer(int nouvellePositionX, int nouvellePositionY) {
+        this.positionX = nouvellePositionX;
+        this.positionY = nouvellePositionY;
+    }
     public void updateVieTextPosition() {
         this.vieText.setX(this.positionX * 50); // Ajustez en fonction de la taille de la case
         this.vieText.setY(this.positionY * 50); // Ajustez en fonction de la taille de la case
