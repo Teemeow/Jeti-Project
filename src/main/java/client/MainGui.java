@@ -21,7 +21,13 @@ public class MainGui extends Application {
 
 
     public void acceuil(){
-        Acceuil acceuil = new Acceuil(this);
+
+        String address = "127.0.0.1";
+        int port = 1025;
+
+        Acceuil acceuil = new Acceuil();
+        Client client = new Client(address, port, acceuil);
+        acceuil.setClient(client);
         Group root = new Group();
         root.getChildren().add(acceuil);
         Scene scene = new Scene(root, 600, 600);
