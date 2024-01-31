@@ -1,5 +1,6 @@
 package client;
 
+import common.Message;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
@@ -21,7 +22,7 @@ public class Plateau extends Parent {
         this.plateau = gridPane;
     }
 
-    public GridPane initPlateau(){
+    public GridPane initPlateau(Client client){
         Armee armee = new Armee("T");
         Unite unite1 = new Unite("Bob", 600, 20,2,1,8,4);
         Unite unite2 = new Unite("Bob", 4, 20,2,1,2,5);
@@ -35,7 +36,7 @@ public class Plateau extends Parent {
             for (int colonne = 0; colonne < nbColonnes; colonne++){
                 Case caseJeu = creerCase(ligne , colonne);
                 this.plateau.add(caseJeu, colonne, ligne);
-                setMove(caseJeu, armee);
+                setMove(caseJeu, armee, client);
             }
         }
         placerUnite(unite1);
@@ -95,10 +96,15 @@ public class Plateau extends Parent {
         }
     }
 
-    public void setMove(Case caseJeu, Armee armee){
-        for (Unite unite: armee.getLesUnites()){
+    public void setMove(Case caseJeu, Armee armee, Client client) {
+        for (Unite unite : armee.getLesUnites()) {
             caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu, unite));
-            unite.getCircle().setOnMouseClicked(even -> handleUniteClick(unite));
+
+            unite.getCircle().setOnMouseClicked(even -> {
+                // Au clic sur le pion, envoie un message au serveur pour indiquer l'action
+                Message moveMessage = new Message("move", unite.getPositionX() + "," + unite.getPositionY());
+                client.sendMessage(moveMessage);
+            });
         }
     }
 

@@ -18,15 +18,15 @@ public class MainGui extends Application {
         this.stage = stage;
         acceuil();
     }
-
+    private Client client;
 
     public void acceuil(){
 
         String address = "127.0.0.1";
         int port = 1025;
 
-        Acceuil acceuil = new Acceuil();
-        Client client = new Client(address, port, acceuil);
+        Acceuil acceuil = new Acceuil(this);
+        this . client = new Client(address, port, acceuil);
         acceuil.setClient(client);
         Group root = new Group();
         root.getChildren().add(acceuil);
@@ -39,7 +39,7 @@ public class MainGui extends Application {
     public void plateau(){
         Plateau p = new Plateau(new GridPane());
 
-        GridPane plateau = p.initPlateau();
+        GridPane plateau = p.initPlateau(this.client);
         Scene scene = new Scene(plateau, 600, 600);
         stage.setTitle("LE JEU");
         stage.setScene(scene);

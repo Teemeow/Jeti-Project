@@ -14,11 +14,12 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.TextFlow;
 
-/*public class Acceuil extends Parent {
+public class Acceuil extends Parent {
     private Button playButton;
     private Button leaveButton;
     private MainGui mainGui;
     private Client client;
+    private TextFlow receivedText;
 
     public Client getClient() {
         return client;
@@ -55,9 +56,23 @@ import javafx.scene.text.TextFlow;
     public void  lancerPartie(){
         this.mainGui.plateau();
     }
-}*/
+    public void printNewMessage(Message mess) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Label text = new Label("\n" + mess);
+                if (receivedText != null) {
+                    text.setPrefWidth(receivedText.getPrefWidth() - 20);
+                    text.setAlignment(Pos.CENTER_LEFT);
+                    receivedText.getChildren().add(text);
+                }
+            }
+        });
+    }
+}
 
-public class Acceuil extends Parent {
+
+/*public class Acceuil extends Parent {
     private ScrollPane scrollReceivedText;
     private TextArea textToSend;
     private Button clearBtn;
@@ -133,15 +148,5 @@ public class Acceuil extends Parent {
         this.getChildren().add(sendBtn);
     }
 
-    public void printNewMessage(Message mess) {
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                Label text = new Label("\n" + mess);
-                text.setPrefWidth(receivedText.getPrefWidth() - 20);
-                text.setAlignment(Pos.CENTER_LEFT);
-                receivedText.getChildren().add(text);
-            }
-        });
-    }
-}
+
+}*/
