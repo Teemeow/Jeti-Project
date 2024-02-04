@@ -17,7 +17,7 @@ public class MainClient {
             } else {
                 String address = args[0];
                 Integer port =  Integer.valueOf(args[1]);
-                Client c = new Client(address, port);
+                //Client c = new Client(address, port);
             }
         } catch (Exception e) {
             e.printStackTrace();

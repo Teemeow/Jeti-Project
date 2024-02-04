@@ -12,7 +12,8 @@ public class PlateauGui extends Application {
         Plateau plateau = new Plateau(new GridPane());
         Group root = new Group();
         root.getChildren().add(plateau);
-        Scene scene = new Scene(root, 600, 600);
+        Scene scene = new Scene(root, 600, 1200);
+        stage.setFullScreen(true);
         stage.setTitle("Plateau");
         stage.setScene(scene);
         stage.show();

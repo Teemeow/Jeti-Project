@@ -13,6 +13,8 @@ public class MainGui extends Application {
     private int nbColonnes = 10;
     private int nbLigne = 10;
     private Stage stage;
+    private Client client;
+
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
@@ -21,10 +23,17 @@ public class MainGui extends Application {
 
 
     public void acceuil(){
+
+        String address = "127.0.0.1";
+        int port = 1025;
+
         Acceuil acceuil = new Acceuil(this);
+        this.client = new Client(address, port, acceuil);
+        acceuil.setClient(client);
         Group root = new Group();
         root.getChildren().add(acceuil);
         Scene scene = new Scene(root, 600, 600);
+        stage.setFullScreen(true);
         stage.setTitle("Jeti");
         stage.setScene(scene);
         stage.show();
@@ -32,9 +41,10 @@ public class MainGui extends Application {
 
     public void plateau(){
         Plateau p = new Plateau(new GridPane());
-
-        GridPane plateau = p.initPlateau();
-        Scene scene = new Scene(plateau, 600, 600);
+        this.client.setPlateau(p);
+        GridPane plateau = p.initPlateau(this.client);
+        Scene scene = new Scene(plateau, 1200, 600);
+        stage.setFullScreen(true);
         stage.setTitle("LE JEU");
         stage.setScene(scene);
         stage.show();

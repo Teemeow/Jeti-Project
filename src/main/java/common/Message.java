@@ -29,6 +29,7 @@ public class Message implements Serializable {
     }
 
     public String toString(){
-        return this.sender + " - " + this.content;
+        //return this.sender + " - " + this.content;
+        return this.content;
     }
 }

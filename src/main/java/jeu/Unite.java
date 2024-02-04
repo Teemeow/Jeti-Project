@@ -15,19 +15,21 @@ public class Unite {
     private int positionY;
     private Text vieText;
     private Circle circle;
+    private int porteeAttaque;
 
-    public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY) {
+    public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY, Color color, int porteeAttaque) {
         this.nom = nom;
         this.vie = vie;
         this.attaque = attaque;
         this.defense = defense;
         this.numero = numero;
-        this.couleur = Color.RED;
+        this.couleur = color;
         this.positionX = positionX;
         this.positionY = positionY;
         this.circle = new Circle(25, this.couleur);
         this.vieText = new Text(String.valueOf(vie));
         this.vieText.setFill(Color.WHITE);
+        this.porteeAttaque = porteeAttaque;
     }
 
     public Text getVieText() {
@@ -111,6 +113,14 @@ public class Unite {
         this.circle = circle;
     }
 
+    public int getPorteeAttaque() {
+        return porteeAttaque;
+    }
+
+    public void setPorteeAttaque(int porteeAttauqe) {
+        this.porteeAttaque = porteeAttauqe;
+    }
+
     public void attaquer(Unite ennemie){
         int degat = 0;
         degat = this.attaque - ennemie.getDefense();
@@ -133,6 +143,10 @@ public class Unite {
         this.setVie(this.vie - degat);
     }
 
+
+    /**
+     * @return True si l'unite est morte
+     */
     public boolean estMort(){
         return this.vie <= 0 ? true : false;
     }
@@ -158,5 +172,11 @@ public class Unite {
     public void updateVieTextPosition() {
         this.vieText.setX(this.positionX * 50); // Ajustez en fonction de la taille de la case
         this.vieText.setY(this.positionY * 50); // Ajustez en fonction de la taille de la case
+    }
+    public boolean estDansPortee(Unite autreUnite) {
+        int distanceX = Math.abs(this.getPositionX() - autreUnite.getPositionX());
+        int distanceY = Math.abs(this.getPositionY() - autreUnite.getPositionY());
+
+        return distanceX <= this.getPorteeAttaque() && distanceY <= this.getPorteeAttaque();
     }
 }
