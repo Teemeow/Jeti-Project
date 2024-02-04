@@ -13,12 +13,14 @@ public class MainGui extends Application {
     private int nbColonnes = 10;
     private int nbLigne = 10;
     private Stage stage;
+    private Client client;
+
     @Override
     public void start(Stage stage) throws Exception {
         this.stage = stage;
         acceuil();
     }
-    private Client client;
+
 
     public void acceuil(){
 
@@ -26,7 +28,7 @@ public class MainGui extends Application {
         int port = 1025;
 
         Acceuil acceuil = new Acceuil(this);
-        this . client = new Client(address, port, acceuil);
+        this.client = new Client(address, port, acceuil);
         acceuil.setClient(client);
         Group root = new Group();
         root.getChildren().add(acceuil);
@@ -38,7 +40,7 @@ public class MainGui extends Application {
 
     public void plateau(){
         Plateau p = new Plateau(new GridPane());
-
+        this.client.setPlateau(p);
         GridPane plateau = p.initPlateau(this.client);
         Scene scene = new Scene(plateau, 600, 600);
         stage.setTitle("LE JEU");

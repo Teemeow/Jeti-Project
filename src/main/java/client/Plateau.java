@@ -1,6 +1,8 @@
 package client;
 
 import common.Message;
+import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
@@ -17,6 +19,7 @@ public class Plateau extends Parent {
     private Unite uniteChoose;
     private Unite uniteAttaquante;
     private Armee armee;
+    private Client client;
 
     public Plateau(GridPane gridPane){
         this.plateau = gridPane;
@@ -25,9 +28,9 @@ public class Plateau extends Parent {
     public GridPane initPlateau(Client client){
         Armee armee = new Armee("T");
         Unite unite1 = new Unite("Bob", 600, 20,2,1,8,4);
-        Unite unite2 = new Unite("Bob", 4, 20,2,1,2,5);
+        Unite unite2 = new Unite("Bob", 4, 20,2,9,2,5);
         Armee armee2 = new Armee("B");
-        Unite unite3 = new Unite("Bob", 27, 20,2,1,9,3);
+        Unite unite3 = new Unite("Bob", 27, 20,2,18,9,3);
         this.armee = armee;
         armee.ajouterUnite(unite1);
         armee.ajouterUnite(unite2);
@@ -45,7 +48,7 @@ public class Plateau extends Parent {
         Button attaqueButton = new Button("Attaquer");
         attaqueButton.setOnAction(event -> handleAttaqueButtonClick());
         this.plateau.add(attaqueButton, nbColonnes, nbLigne);
-    return this.plateau;
+        return this.plateau;
     }
 
     public Case creerCase(int ligne, int colonne){
@@ -73,7 +76,7 @@ public class Plateau extends Parent {
         this.uniteChoose = unite;
     }
 
-    public void handleCaseClick(Case caseJeu, Unite unite){
+    public void handleCaseClick(Case caseJeu, Unite unite, Client client){
         if(this.uniteChoose != null){
             this.uniteChoose.deplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
             // Déplace l'unité vers la nouvelle case
@@ -92,19 +95,22 @@ public class Plateau extends Parent {
             this.plateau.add(this.uniteChoose.getVieText(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
 
             this.uniteChoose.getCircle().setStroke(null);
+
+            // Au clic sur le pion, envoie un message au serveur pour indiquer l'action
+            Message moveMessage = new Message("move",this.uniteChoose.getNumero() + "," + this.uniteChoose.getPositionX() + "," + this.uniteChoose.getPositionY());
+            client.sendMessage(moveMessage);
             this.uniteChoose = null;
         }
     }
 
     public void setMove(Case caseJeu, Armee armee, Client client) {
         for (Unite unite : armee.getLesUnites()) {
-            caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu, unite));
+            caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu, unite, client));
 
             unite.getCircle().setOnMouseClicked(even -> {
-                // Au clic sur le pion, envoie un message au serveur pour indiquer l'action
-                Message moveMessage = new Message("move", unite.getPositionX() + "," + unite.getPositionY());
-                client.sendMessage(moveMessage);
+                handleUniteClick(unite);
             });
+
         }
     }
 
@@ -151,5 +157,55 @@ public class Plateau extends Parent {
             unite.getCircle().setStroke(null);
             unite.getCircle().setOnMouseClicked(event -> handleUniteClick(unite));
         }
+    }
+
+
+
+    public Unite getUniteById(int unitID, Armee armee) {
+        for (Unite unite : armee.getLesUnites()) {
+            if (unite.getNumero() == unitID) {
+                return unite;
+            }
+        }
+        return null; // Unité non trouvée
+    }
+    public Case getCaseAt(int ligne, int colonne) {
+        Node node = null;
+        for (Node child : plateau.getChildren()) {
+            if (GridPane.getRowIndex(child) == ligne && GridPane.getColumnIndex(child) == colonne) {
+                node = child;
+                break;
+            }
+        }
+        if (node instanceof Case) {
+            return (Case) node;
+        } else {
+            return null;
+        }
+    }
+    public void  test(int unitID, int x, int y){
+        Armee a = this.armee;
+        Platform.runLater((new Runnable() {
+            @Override
+            public void run() {
+                Unite bouf = getUniteById(unitID, a);
+                System.out.println(bouf.getNumero());
+                bouf.deplacer(x, y);
+
+                // Obtient la case à la position (1, 1)
+                Case caseCible = getCaseAt(x, y);
+
+
+                // Met à jour les positions X et Y de l'unité en utilisant la position de la case
+                plateau.getChildren().remove(bouf.getCircle());
+                plateau.add(bouf.getCircle(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
+                bouf.setPositionX(GridPane.getRowIndex(caseCible));
+                bouf.setPositionY(GridPane.getColumnIndex(caseCible));
+
+                plateau.getChildren().remove(bouf.getVieText());
+                plateau.add(bouf.getVieText(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
+                bouf.updateVieTextPosition();
+            }
+        }));
     }
 }
