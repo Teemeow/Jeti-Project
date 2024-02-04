@@ -54,10 +54,14 @@ public class Client {
     public Message messageReceived(Message message){
         view.printNewMessage(message);
         System.out.println(message);
-        if(plateau != null && message.getContent().length() <= 6){
+        if (plateau != null && message.getContent().length() == 3){
             List<Integer> infos =  getInfos(message.getContent());
             System.out.println(infos);
-            this.plateau.test( infos.get(0), infos.get(1), infos.get(2));
+            this.plateau.attackServer(infos.get(0), infos.get(1));
+        } else if (this.plateau != null && message.getContent().length() <= 6){
+            List<Integer> infos =  getInfos(message.getContent());
+            System.out.println(infos);
+            this.plateau.moveServer( infos.get(0), infos.get(1), infos.get(2));
         }
         return message;
     }
@@ -71,21 +75,26 @@ public class Client {
         }
     }
 
-    public List<Integer> getInfos(String co){
+    public List<Integer> getInfos(String data){
         // Sépare la chaîne en parties en utilisant la virgule comme délimiteur
-        String[] parts = co.split(",");
+        String[] parts = data.split(",");
         List<Integer> infos = new ArrayList<Integer>();
 
+
+        for (String d:parts) {
+            int in = Integer.parseInt(d);
+            infos.add(in);
+        }
         // Convertit les parties en entiers
-        int numUnite = Integer.parseInt(parts[0]);
-        int xCoordinate = Integer.parseInt(parts[1]);
-        int yCoordinate = Integer.parseInt(parts[2]);
+        //int numUnite = Integer.parseInt(parts[0]);
+        //int xCoordinate = Integer.parseInt(parts[1]);
+        //int yCoordinate = Integer.parseInt(parts[2]);
+//
+        //infos.add(numUnite);
+        //infos.add(xCoordinate);
+        //infos.add(yCoordinate);
 
-        infos.add(numUnite);
-        infos.add(xCoordinate);
-        infos.add(yCoordinate);
-
-     return infos;
+        return infos;
     }
 
     public Plateau getPlateau() {
