@@ -16,8 +16,9 @@ public class Unite {
     private Text vieText;
     private Circle circle;
     private int porteeAttaque;
+    private int porteeDeplacement;
 
-    public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY, Color color, int porteeAttaque) {
+    public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY, Color color, int porteeAttaque, int porteeDeplacement) {
         this.nom = nom;
         this.vie = vie;
         this.attaque = attaque;
@@ -30,6 +31,7 @@ public class Unite {
         this.vieText = new Text(String.valueOf(vie));
         this.vieText.setFill(Color.WHITE);
         this.porteeAttaque = porteeAttaque;
+        this.porteeDeplacement = porteeDeplacement;
     }
 
     public Text getVieText() {
@@ -121,6 +123,14 @@ public class Unite {
         this.porteeAttaque = porteeAttauqe;
     }
 
+    public int getPorteeDeplacement() {
+        return porteeDeplacement;
+    }
+
+    public void setPorteeDeplacement(int porteeDeplacement) {
+        this.porteeDeplacement = porteeDeplacement;
+    }
+
     public void attaquer(Unite ennemie){
         int degat = 0;
         degat = this.attaque - ennemie.getDefense();
@@ -178,5 +188,10 @@ public class Unite {
         int distanceY = Math.abs(this.getPositionY() - autreUnite.getPositionY());
 
         return distanceX <= this.getPorteeAttaque() && distanceY <= this.getPorteeAttaque();
+    }
+    public boolean peuxdeplacer(int nouvellePositionX, int nouvellePositionY){
+        int distanceX = Math.abs(this.getPositionX() - nouvellePositionX);
+        int distanceY = Math.abs(this.getPositionY() - nouvellePositionY);
+        return distanceX <= this.porteeDeplacement && distanceY <= this.porteeDeplacement;
     }
 }
