@@ -2,9 +2,13 @@ package client;
 
 import common.Message;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
@@ -23,18 +27,23 @@ public class Plateau extends Parent {
     private Unite uniteAttaquante;
     private Armee armee;
     private Client client;
-
+    private ScrollPane scrollReceivedText;
+    private TextFlow receivedText;
+    private TextArea textToSend;
+    private Button sendBtn;
+    private Button clearBtn;
     public Plateau(GridPane gridPane){
         this.plateau = gridPane;
     }
 
     public GridPane initPlateau(Client client){
         this.client = client;
+
         Armee armee = new Armee("T");
-        Unite unite1 = new Unite("Bob", 50, 20,2,1,0,0, Color.BLUE, 1);
-        Unite unite2 = new Unite("Bob", 50, 20,2,9,1,0, Color.BLUE, 1);
-        Unite unite3 = new Unite("Bob", 50, 20,2,1,0,1, Color.BLUE, 1);
-        Unite unite4 = new Unite("Bob", 50, 20,2,9,1,1, Color.BLUE, 1);
+        Unite unite1 = new Unite("Bob", 50, 20,2,1,1,1, Color.BLUE, 1);
+        Unite unite2 = new Unite("Bob", 50, 20,2,9,2,1, Color.BLUE, 1);
+        Unite unite3 = new Unite("Bob", 50, 20,2,1,1,2, Color.BLUE, 1);
+        Unite unite4 = new Unite("Bob", 50, 20,2,9,2,2, Color.BLUE, 1);
         Armee armee2 = new Armee("B");
         Unite unite5 = new Unite("Bob", 50, 20,2,18,8,8, Color.RED, 1);
         Unite unite6 = new Unite("Bob", 50, 20,2,18,9,8, Color.RED, 1);
@@ -49,20 +58,87 @@ public class Plateau extends Parent {
         armee.ajouterUnite(unite6);
         armee.ajouterUnite(unite7);
         armee.ajouterUnite(unite8);
-        for (int ligne = 0; ligne < nbLigne; ligne++){
+
+        //Création du plateau
+        for (int ligne = 0; ligne   < nbLigne ; ligne++){
             for (int colonne = 0; colonne < nbColonnes; colonne++){
-                Case caseJeu = creerCase(ligne , colonne);
-                this.plateau.add(caseJeu, colonne, ligne);
-                setMove(caseJeu, armee);
+                if (ligne != 0 && colonne != 0){
+                    Case caseJeu = creerCase(ligne  , colonne);
+                    this.plateau.add(caseJeu, colonne, ligne);
+                    setMove(caseJeu, armee);
+                }
             }
         }
-        for(Unite unite : armee.getLesUnites()){
-            placerUnite(unite);
-        }
+        placerUnite(unite1);
+        placerUnite(unite2);
+        placerUnite(unite3);
+        placerUnite(unite4);
+        placerUnite(unite5);
+        placerUnite(unite6);
+        placerUnite(unite7);
+        placerUnite(unite8);
         Button attaqueButton = new Button("Attaquer");
         attaqueButton.setOnAction(event -> handleAttaqueButtonClick());
-        this.plateau.add(attaqueButton, nbColonnes, nbLigne);
+        this.plateau.add(attaqueButton, 15, 4);
 
+
+
+        this.receivedText = new TextFlow();
+        this.receivedText.setPrefWidth(325);
+        this.plateau.add(receivedText, 23,0);
+
+        this.scrollReceivedText = new ScrollPane();
+        this.scrollReceivedText.setLayoutX(50);
+        this.scrollReceivedText.setLayoutY(50);
+        this.scrollReceivedText.setPrefWidth(350);
+        this.scrollReceivedText.setPrefHeight(300);
+        this.scrollReceivedText.setContent(receivedText);
+        this.scrollReceivedText.vvalueProperty().bind(receivedText.heightProperty());
+        this.plateau.add(scrollReceivedText, 25, 0 );
+
+
+        this.textToSend = new TextArea();
+        this.textToSend.setPrefWidth(375);
+        this.textToSend.setPrefHeight(25);
+        this.textToSend.setPromptText("Message...");
+
+        this.plateau.add(textToSend, 15 , 0);
+
+        this.sendBtn = new Button();
+        this.sendBtn.setVisible(true);
+        this.sendBtn.setPrefWidth(100);
+        this.sendBtn.setPrefHeight(25);
+        this.sendBtn.setText("Envoyer");
+        this.sendBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                if (!textToSend.getText().trim().isEmpty() && textToSend.getText().length() > 6) {
+                    Message message = new Message("User", textToSend.getText());
+
+                    printNewMessage(message);
+                    client.sendMessage(message);
+
+                    textToSend.clear();
+                }
+                else {
+                    printNewMessage(new Message("", "Le message doit faire plus de 6 caractères"));
+                }
+            }
+        });
+        this.plateau.add(sendBtn, 15, 1);
+
+        this.clearBtn = new Button();
+        this.clearBtn.setVisible(true);
+        this.clearBtn.setPrefWidth(100);
+        this.clearBtn.setPrefHeight(25);
+        this.clearBtn.setText("Effacer");
+        this.clearBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                textToSend.clear();
+            }
+        });
+        this.plateau.add(clearBtn, 15, 2);
 
         return this.plateau;
     }
@@ -154,12 +230,15 @@ public class Plateau extends Parent {
     }
 
     private void handleUniteCibleClick(Unite uniteCible) {
+        // Annule la sélection de l'unité cible précédente (si applicable)
+        uniteCible.getCircle().setStroke(null);
         if (uniteAttaquante != null && uniteAttaquante.estDansPortee(uniteCible) && uniteAttaquante != uniteCible) {
-            uniteCible.getCircle().setStroke(null); // Annule la sélection de l'unité cible précédente (si applicable)
-
             // Effectuez l'attaque avec l'unité attaquante et l'unité cible
             uniteAttaquante.attaquer(uniteCible);
-            if(uniteCible.estMort()){
+            //Vérifie si l'unite est morte
+            if (uniteCible.estMort()) {
+                String messageMort = "L'unité " + uniteCible.getNom() + " est morte";
+                printNewMessage(new Message("Info", messageMort));
                 this.plateau.getChildren().remove(uniteCible.getCircle());
                 this.plateau.getChildren().remove(uniteCible.getVieText());
             }
@@ -175,9 +254,11 @@ public class Plateau extends Parent {
             }
 
             uniteCible.updateVieTextPosition();
-
         }else {
-            System.out.println("L'unité cible est hors de portée ou l'unité ne peut pas se suicider !");
+            // Gère le cas où l'unité cible est hors de portée
+            String  messageErreur = "L'unité cible est hors de portée ou ne peut pas se suicider!";
+            printNewMessage(new Message("Info", messageErreur));
+            System.out.println(messageErreur);
         }
         // Réinitialise les sélections et les gestionnaires de clic
         uniteAttaquante = null;
@@ -217,7 +298,6 @@ public class Plateau extends Parent {
             @Override
             public void run() {
                 Unite bouf = getUniteById(unitID, armee);
-                System.out.println(bouf.getNumero());
                 bouf.deplacer(x, y);
 
                 // Obtient la case à la position (1, 1)
@@ -237,7 +317,6 @@ public class Plateau extends Parent {
         });
     }
     public void attackServer(int attackId, int attackedId){
-
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -245,9 +324,24 @@ public class Plateau extends Parent {
                 Unite uniteCible = getUniteById(attackedId, armee);
                 uniteAttaquante.attaquer(uniteCible);
                 uniteCible.updateVieTextPosition();
-                if(uniteCible.estMort()){
+                if (uniteCible.estMort()) {
+                    String messageMort = "L'unité " + uniteCible.getNom() + " est morte";
+                    printNewMessage(new Message("Info", messageMort));
                     plateau.getChildren().remove(uniteCible.getCircle());
                     plateau.getChildren().remove(uniteCible.getVieText());
+                }
+            }
+        });
+    }
+    public void printNewMessage(Message mess) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                Label text = new Label("\n" + mess);
+                if (receivedText != null) {
+                    text.setPrefWidth(receivedText.getPrefWidth() - 20);
+                    text.setAlignment(Pos.CENTER_LEFT);
+                    receivedText.getChildren().add(text);
                 }
             }
         });
