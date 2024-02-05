@@ -34,7 +34,7 @@ public class ConnectedClient implements Runnable{
             boolean isActive = true;
             while (isActive) {
                 Message mess = (Message) in.readObject();
-                mess.setSender(String.valueOf(id));
+                //mess.setSender(String.valueOf(id));
                 if (mess != null){
                     server.broadcastMessage(mess, id);
                 }else {

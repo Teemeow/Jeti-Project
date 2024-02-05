@@ -52,16 +52,17 @@ public class Client {
     }
 
     public Message messageReceived(Message message){
-        view.printNewMessage(message);
-        System.out.println(message);
+
         if (plateau != null && message.getContent().length() == 3){
             List<Integer> infos =  getInfos(message.getContent());
-            System.out.println(infos);
+            //System.out.println(infos);
             this.plateau.attackServer(infos.get(0), infos.get(1));
         } else if (this.plateau != null && message.getContent().length() <= 6){
             List<Integer> infos =  getInfos(message.getContent());
-            System.out.println(infos);
+            //System.out.println(infos);
             this.plateau.moveServer( infos.get(0), infos.get(1), infos.get(2));
+        }else if (plateau != null){
+            plateau.printNewMessage(message);
         }
         return message;
     }

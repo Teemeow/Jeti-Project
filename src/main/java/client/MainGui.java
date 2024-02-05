@@ -33,7 +33,6 @@ public class MainGui extends Application {
         Group root = new Group();
         root.getChildren().add(acceuil);
         Scene scene = new Scene(root, 600, 600);
-        stage.setFullScreen(true);
         stage.setTitle("Jeti");
         stage.setScene(scene);
         stage.show();
@@ -43,8 +42,7 @@ public class MainGui extends Application {
         Plateau p = new Plateau(new GridPane());
         this.client.setPlateau(p);
         GridPane plateau = p.initPlateau(this.client);
-        Scene scene = new Scene(plateau, 1200, 600);
-        stage.setFullScreen(true);
+        Scene scene = new Scene(plateau, 600, 600);
         stage.setTitle("LE JEU");
         stage.setScene(scene);
         stage.show();
