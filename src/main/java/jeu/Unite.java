@@ -9,6 +9,7 @@ public class Unite {
     private int vie;
     private int attaque;
     private int defense;
+    private  int defenseBase;
     private int numero;
     private Color couleur;
     private int positionX;
@@ -17,21 +18,24 @@ public class Unite {
     private Circle circle;
     private int porteeAttaque;
     private int porteeDeplacement;
+    private int porteeDeplacementBase;
 
     public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY, Color color, int porteeAttaque, int porteeDeplacement) {
         this.nom = nom;
         this.vie = vie;
         this.attaque = attaque;
         this.defense = defense;
+        this.defenseBase = defense;
         this.numero = numero;
         this.couleur = color;
         this.positionX = positionX;
         this.positionY = positionY;
-        this.circle = new Circle(25, this.couleur);
+        this.circle = new Circle(15, this.couleur);
         this.vieText = new Text(String.valueOf(vie));
         this.vieText.setFill(Color.WHITE);
         this.porteeAttaque = porteeAttaque;
         this.porteeDeplacement = porteeDeplacement;
+        this.porteeDeplacementBase = porteeDeplacement;
     }
 
     public Text getVieText() {
@@ -161,16 +165,23 @@ public class Unite {
         return this.vie <= 0 ? true : false;
     }
 
-    public void appliquerTerrain(Case position){
-        switch (position.getNom()){
+    public void appliquerTerrain(Case casejeu){
+        switch (casejeu.getNom()){
+            case "plaine":
+                setDefense(defenseBase);
+                setPorteeDeplacement( porteeDeplacementBase);
+                break;
             case "foret":
-                this.defense++;
+                setDefense(defenseBase + 1);
+                setPorteeDeplacement( porteeDeplacementBase);
                 break;
             case "desert":
-                //moins de déplacement
+                setDefense(defenseBase);
+                setPorteeDeplacement( porteeDeplacementBase - 1);
                 break;
             case "fort":
-                defense += 2;
+                setDefense(defenseBase + 2);
+                setPorteeDeplacement( porteeDeplacementBase);
                 break;
         }
     }
