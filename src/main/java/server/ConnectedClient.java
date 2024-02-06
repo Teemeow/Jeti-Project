@@ -27,26 +27,6 @@ public class ConnectedClient implements Runnable{
         }
     }
 
-    @Override
-    public void run() {
-        try{
-            in = new ObjectInputStream(socket.getInputStream());
-            boolean isActive = true;
-            while (isActive) {
-                Message mess = (Message) in.readObject();
-                //mess.setSender(String.valueOf(id));
-                if (mess != null){
-                    server.broadcastMessage(mess, id);
-                }else {
-                    server.disconnectedClient(this);
-                    isActive = false;
-                }
-            }
-        }catch (Exception e){
-            System.out.println(e);
-        }
-    }
-
     public int getId() {
         return id;
     }
@@ -85,6 +65,26 @@ public class ConnectedClient implements Runnable{
 
     public void setServer(Server server) {
         this.server = server;
+    }
+
+    @Override
+    public void run() {
+        try{
+            in = new ObjectInputStream(socket.getInputStream());
+            boolean isActive = true;
+            while (isActive) {
+                Message mess = (Message) in.readObject();
+                //mess.setSender(String.valueOf(id));
+                if (mess != null){
+                    server.broadcastMessage(mess, id);
+                }else {
+                    server.disconnectedClient(this);
+                    isActive = false;
+                }
+            }
+        }catch (Exception e){
+            System.out.println(e);
+        }
     }
 
     public void sendMessage(Message mess){
