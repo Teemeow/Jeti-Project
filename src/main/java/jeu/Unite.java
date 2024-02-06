@@ -19,6 +19,7 @@ public class Unite {
     private int porteeAttaque;
     private int porteeDeplacement;
     private int porteeDeplacementBase;
+    private Armee armee;
 
     public Unite(String nom, int vie, int attaque, int defense, int numero, int positionX, int positionY, Color color, int porteeAttaque, int porteeDeplacement) {
         this.nom = nom;
@@ -30,7 +31,7 @@ public class Unite {
         this.couleur = color;
         this.positionX = positionX;
         this.positionY = positionY;
-        this.circle = new Circle(15, this.couleur);
+        this.circle = new Circle(20, this.couleur);
         this.vieText = new Text(String.valueOf(vie));
         this.vieText.setFill(Color.WHITE);
         this.porteeAttaque = porteeAttaque;
@@ -129,6 +130,14 @@ public class Unite {
 
     public int getPorteeDeplacement() {
         return porteeDeplacement;
+    }
+
+    public Armee getArmee() {
+        return armee;
+    }
+
+    public void setArmee(Armee armee) {
+        this.armee = armee;
     }
 
     public void setPorteeDeplacement(int porteeDeplacement) {
