@@ -18,6 +18,8 @@ import jeu.Armee;
 import jeu.Case;
 import jeu.Unite;
 
+import java.util.Random;
+
 public class Plateau extends Parent {
     private int tailleCase = 50;
     private int nbColonnes = 10;
@@ -41,16 +43,17 @@ public class Plateau extends Parent {
 
         Armee armee = new Armee("T");
         Unite unite1 = new Unite("Bob", 50, 20,2,1,1,1, Color.BLUE, 1, 2);
-        Unite unite2 = new Unite("Bob", 50, 20,2,9,2,1, Color.BLUE, 1, 2);
-        Unite unite3 = new Unite("Bob", 50, 20,2,1,1,2, Color.BLUE, 1, 2);
-        Unite unite4 = new Unite("Bob", 50, 20,2,9,2,2, Color.BLUE, 1, 2);
+        Unite unite2 = new Unite("Bob", 50, 20,2,2,2,1, Color.BLUE, 1, 2);
+        Unite unite3 = new Unite("Bob", 50, 20,2,3,1,2, Color.BLUE, 1, 2);
+        Unite unite4 = new Unite("Bob", 50, 20,2,4,2,2, Color.BLUE, 1, 2);
         Armee armee2 = new Armee("B");
-        Unite unite5 = new Unite("Bob", 50, 20,2,18,8,8, Color.RED, 1, 2);
-        Unite unite6 = new Unite("Bob", 50, 20,2,18,9,8, Color.RED, 1, 2);
-        Unite unite7 = new Unite("Bob", 50, 20,2,18,8,9, Color.RED, 1, 2);
-        Unite unite8 = new Unite("Bob", 50, 20,2,18,9,9, Color.RED, 1, 2);
+        Unite unite5 = new Unite("Bob", 50, 20,2,5,8,8, Color.RED, 1, 2);
+        Unite unite6 = new Unite("Bob", 50, 20,2,6,9,8, Color.RED, 1, 2);
+        Unite unite7 = new Unite("Bob", 50, 20,2,7,8,9, Color.RED, 1, 2);
+        Unite unite8 = new Unite("Bob", 50, 20,2,8,9,9, Color.RED, 1, 2);
         this.armee = armee;
         armee.ajouterUnite(unite1);
+        System.out.println("Avant : " + unite1.getDefense() + " " + unite1.getPositionX() + " " + unite1.getPositionY());
         armee.ajouterUnite(unite2);
         armee.ajouterUnite(unite3);
         armee.ajouterUnite(unite4);
@@ -58,6 +61,7 @@ public class Plateau extends Parent {
         armee.ajouterUnite(unite6);
         armee.ajouterUnite(unite7);
         armee.ajouterUnite(unite8);
+
 
         //Création du plateau
         for (int ligne = 0; ligne   < nbLigne ; ligne++){
@@ -69,14 +73,10 @@ public class Plateau extends Parent {
                 }
             }
         }
-        placerUnite(unite1);
-        placerUnite(unite2);
-        placerUnite(unite3);
-        placerUnite(unite4);
-        placerUnite(unite5);
-        placerUnite(unite6);
-        placerUnite(unite7);
-        placerUnite(unite8);
+        for (Unite unite : armee.getLesUnites()){
+            placerUnite(unite);
+            unite.appliquerTerrain(getCaseAt(unite.getPositionY(), unite.getPositionX()));
+        }
         Button attaqueButton = new Button("Attaquer");
         attaqueButton.setOnAction(event -> handleAttaqueButtonClick());
         this.plateau.add(attaqueButton, 15, 4);
@@ -144,13 +144,57 @@ public class Plateau extends Parent {
     }
 
     public Case creerCase(int ligne, int colonne){
+        Case caseJeu = null;
+        Random random = new Random();
+        if (ligne == 3 && colonne == 2 || ligne == 7 && colonne == 8){
+            caseJeu = createFort();
+        }else if (ligne >= 4 &&  ligne <=5 && colonne >= 4 && colonne <= 7){
+            caseJeu = createDesert();
+        }else if (ligne >= 3 &&  ligne <=6 && colonne >= 3 && colonne <= 8){
+
+            int nombreAleatoire = random.nextInt(2) + 1;
+
+            if (nombreAleatoire == 1){
+                caseJeu = createDesert();
+            }
+            else {
+                caseJeu = createPlaine();
+            }
+        }
+        else {
+            int nombreAleatoire = random.nextInt(7) + 1;
+            if (nombreAleatoire == 1){
+                caseJeu = createForet();
+            }
+            else {
+                caseJeu = createPlaine();
+            }
+        }
+
+        return caseJeu ;
+    }
+
+
+    public Case createDesert(){
+        Case caseJeu = new Case("desert", tailleCase, tailleCase);
+        caseJeu.setFill(Color.YELLOW);
+        return caseJeu;
+    }
+    public Case createPlaine(){
         Case caseJeu = new Case("plaine", tailleCase, tailleCase);
-        caseJeu.setFill(chooseColor(ligne, colonne));
+        caseJeu.setFill(Color.MEDIUMSEAGREEN);
         return caseJeu;
     }
 
-    public Color chooseColor(int ligne, int colonne){
-        return (ligne + colonne) % 2 == 0 ? Color.WHITE : Color.BLACK;
+    public Case createForet(){
+        Case caseJeu = new Case("foret", tailleCase, tailleCase);
+        caseJeu.setFill(Color.DARKGREEN);
+        return caseJeu;
+    }
+    public Case createFort(){
+        Case caseJeu = new Case("fort", tailleCase, tailleCase);
+        caseJeu.setFill(Color.GREY);
+        return caseJeu;
     }
 
     public void placerUnite(Unite unite){
@@ -196,7 +240,7 @@ public class Plateau extends Parent {
                 String messageMort = "L'unité peux se déplacer d'uniquement " + uniteChoose.getPorteeDeplacement() + " cases";
                 printNewMessage(new Message("Info", messageMort));
             }
-
+            uniteChoose.appliquerTerrain(caseJeu);
             this.uniteChoose = null;
         }
     }
@@ -204,11 +248,9 @@ public class Plateau extends Parent {
     public void setMove(Case caseJeu, Armee armee) {
         for (Unite unite : armee.getLesUnites()) {
             caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu));
-
             unite.getCircle().setOnMouseClicked(even -> {
                 handleUniteClick(unite);
             });
-
         }
     }
 
@@ -308,8 +350,7 @@ public class Plateau extends Parent {
 
                 // Obtient la case à la position (1, 1)
                 Case caseCible = getCaseAt(x, y);
-
-
+                bouf.appliquerTerrain(caseCible);
                 // Met à jour les positions X et Y de l'unité en utilisant la position de la case
                 plateau.getChildren().remove(bouf.getCircle());
                 plateau.add(bouf.getCircle(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
