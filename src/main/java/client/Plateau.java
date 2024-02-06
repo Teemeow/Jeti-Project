@@ -45,15 +45,15 @@ public class Plateau extends Parent {
         //Création des unitées et des armmées
         this.unitesJeu = new ArrayList<>();
         Armee armee = new Armee("Bleu");
-        Unite unite1 = new Unite("Bob", 50, 20,2,1,1,1, Color.BLUE, 1, 2);
-        Unite unite2 = new Unite("Bob", 50, 20,2,2,2,1, Color.BLUE, 1, 2);
-        Unite unite3 = new Unite("Bob", 50, 20,2,3,1,2, Color.BLUE, 1, 2);
-        Unite unite4 = new Unite("Bob", 50, 20,2,4,2,2, Color.BLUE, 1, 2);
         Armee armee2 = new Armee("Rouge");
-        Unite unite5 = new Unite("Bob", 50, 20,2,5,8,8, Color.RED, 1, 2);
-        Unite unite6 = new Unite("Bob", 50, 20,2,6,9,8, Color.RED, 1, 2);
-        Unite unite7 = new Unite("Bob", 50, 20,2,7,8,9, Color.RED, 1, 2);
-        Unite unite8 = new Unite("Bob", 50, 20,2,8,9,9, Color.RED, 1, 2);
+        Unite unite1 = new Unite("Bob", 50, 20,2,1,1,1, Color.BLUE, 1, 2);
+        Unite unite2 = new Unite("Gump", 50, 20,2,2,2,1, Color.BLUE, 1, 2);
+        Unite unite3 = new Unite("Marth", 50, 20,2,3,1,2, Color.BLUE, 1, 2);
+        Unite unite4 = new Unite("Lucina", 50, 20,2,4,2,2, Color.BLUE, 1, 2);
+        Unite unite5 = new Unite("Roy", 50, 20,2,5,8,8, Color.RED, 1, 2);
+        Unite unite6 = new Unite("Celica", 50, 20,2,6,9,8, Color.RED, 1, 2);
+        Unite unite7 = new Unite("Alm", 50, 20,2,7,8,9, Color.RED, 1, 2);
+        Unite unite8 = new Unite("Forest", 50, 20,2,8,9,9, Color.RED, 1, 2);
         armee.ajouterUnite(unite1);
         armee.ajouterUnite(unite2);
         armee.ajouterUnite(unite3);
@@ -128,7 +128,7 @@ public class Plateau extends Parent {
                     textToSend.clear();
                 }
                 else {
-                    printNewMessage(new Message("", "Le message doit faire plus de 6 caractères"));
+                    printNewMessage(new Message("Infos", "Le message doit faire plus de 6 caractères."));
                 }
             }
         });
@@ -210,28 +210,28 @@ public class Plateau extends Parent {
         unite.updateVieTextPosition();
     }
 
+    //Gestion du clic sur une unité
     public void handleUniteClick(Unite unite){
         if (this.uniteChoisie != null){
             this.uniteChoisie.getCircle().setStroke(null);
         }
-
         unite.getCircle().setStroke(Color.BLUE);
         this.uniteChoisie = unite;
     }
 
+    //Gestion du clic sur une case
     public void handleCaseClick(Case caseJeu){
         if(this.uniteChoisie != null){
-            if (this.uniteChoisie.peuxdeplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu))){
-                this.uniteChoisie.deplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
+            //Verifie si l'unite peut aller jusqu'a la case
+            if (this.uniteChoisie.canMove(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu))){
+                this.uniteChoisie.move(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
                 // Déplace l'unité vers la nouvelle case
                 this.plateau.getChildren().remove(this.uniteChoisie.getCircle());
                 this.plateau.add(this.uniteChoisie.getCircle(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
 
-                // Met à jour la position de l'unité
+                // Met a jour la position de l'unite et du texte de la vie
                 this.uniteChoisie.setPositionX(GridPane.getColumnIndex(caseJeu));
                 this.uniteChoisie.setPositionY(GridPane.getRowIndex(caseJeu));
-
-                // Met à jour la position du texte de la vie
                 this.uniteChoisie.updateVieTextPosition();
 
                 // Déplace le texte de la vie vers la nouvelle case
@@ -244,14 +244,15 @@ public class Plateau extends Parent {
                 Message moveMessage = new Message("move",this.uniteChoisie.getNumero() + "," + this.uniteChoisie.getPositionX() + "," + this.uniteChoisie.getPositionY());
                 this.client.sendMessage(moveMessage);
             }else {
-                String messageMort = "L'unité peux se déplacer d'uniquement " + uniteChoisie.getPorteeDeplacement() + " cases";
-                printNewMessage(new Message("Info", messageMort));
+                String messageMort = "L'unité peux se déplacer d'uniquement " + uniteChoisie.getPorteeDeplacement() + " cases.";
+                printNewMessage(new Message("Infos", messageMort));
             }
             uniteChoisie.appliquerTerrain(caseJeu);
             this.uniteChoisie = null;
         }
     }
 
+    //Configuration d'evenement pour les cases et unites
     public void setMove(Case caseJeu, Armee armee) {
         for (Unite unite : armee.getLesUnites()) {
             caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu));
@@ -261,6 +262,7 @@ public class Plateau extends Parent {
         }
     }
 
+    //Gestion du clic sur le bouton attaquer
     public void handleAttaqueButtonClick() {
         if (uniteAttaquante != null) {
             // L'unité attaquante a déjà été choisie, permet à l'utilisateur de choisir l'unité cible
@@ -268,12 +270,16 @@ public class Plateau extends Parent {
                 unite.getCircle().setStroke(Color.BLACK);
                 unite.getCircle().setOnMouseClicked(event -> handleUniteCibleClick(unite));
             }
+            String  messageInfos = "Choisissez l'unité qui va se faire attaquer.";
+            printNewMessage(new Message("Infos", messageInfos));
         } else {
-            // Aucune unité attaquante n'a été choisie, permet à l'utilisateur de choisir l'unité attaquante
+            // Aucune unité attaquante n'a été choisie permet à l'utilisateur de choisir l'unité attaquante
             for (Unite unite : this.unitesJeu) {
                 unite.getCircle().setStroke(Color.GREEN);
                 unite.getCircle().setOnMouseClicked(event -> handleUniteAttaquanteClick(unite));
             }
+            String  messageInfos = "Choisissez l'unité qui va attaquer, puis réappuyer sur le bouton d'attaque.";
+            printNewMessage(new Message("Infos", messageInfos));
         }
     }
 
@@ -284,16 +290,15 @@ public class Plateau extends Parent {
         unite.getCircle().setOnMouseClicked(null);
     }
 
+    //Gestion du clic sur une unite cible
     private void handleUniteCibleClick(Unite uniteCible) {
         // Annule la sélection de l'unité cible précédente (si applicable)
         uniteCible.getCircle().setStroke(null);
-        if (uniteAttaquante != null && uniteAttaquante.estDansPortee(uniteCible) && uniteAttaquante != uniteCible && uniteAttaquante.getArmee() != uniteCible.getArmee()) {
-            // Effectuez l'attaque avec l'unité attaquante et l'unité cible
-            uniteAttaquante.attaquer(uniteCible);
-            //Vérifie si l'unite est morte
-            if (uniteCible.estMort()) {
+        if (uniteAttaquante != null && uniteAttaquante.inRange(uniteCible) && uniteAttaquante != uniteCible && uniteAttaquante.getArmee() != uniteCible.getArmee()) {
+            uniteAttaquante.attack(uniteCible);
+            if (uniteCible.die()) {
                 String messageMort = "L'unité " + uniteCible.getNom() + " est morte.";
-                printNewMessage(new Message("Info", messageMort));
+                printNewMessage(new Message("Infos", messageMort));
                 this.plateau.getChildren().remove(uniteCible.getCircle());
                 this.plateau.getChildren().remove(uniteCible.getVieText());
             }
@@ -303,21 +308,17 @@ public class Plateau extends Parent {
             Message attackMessage = new Message("attack", uniteAttaquante.getNumero() + "," + uniteCible.getNumero());
             this.client.sendMessage(attackMessage);
 
-            // Assurez-vous que la positionX et positionY sont valides
-            if (positionX >= 0 && positionX < nbColonnes && positionY >= 0 && positionY < nbLigne) {
-                uniteCible.deplacer(positionX, positionY);
-            }
-
             uniteCible.updateVieTextPosition();
         }else {
             // Gère le cas où l'unité cible est hors de portée
             String  messageErreur = "Cible invalide ou hors de portée.";
-            printNewMessage(new Message("Info", messageErreur));
+            printNewMessage(new Message("Infos", messageErreur));
             System.out.println(messageErreur);
         }
         if (uniteCible.getArmee().encoreUnite()){
-            String  messageFin = "Parti terminée l'armée " + uniteAttaquante.getArmee().getNom() + " à remportée la parti.";
-            printNewMessage(new Message("Info", messageFin));
+            String  messageFin = "Partie terminée l'armée " + uniteAttaquante.getArmee().getNom() + " à gagné.";
+            this.client.sendMessage(new Message("Infos", messageFin));
+            printNewMessage(new Message("Infos", messageFin));
         }
         // Réinitialise les sélections et les gestionnaires de clic
         uniteAttaquante = null;
@@ -334,8 +335,12 @@ public class Plateau extends Parent {
                 return unite;
             }
         }
-        return null; // Unité non trouvée
+        return null;
     }
+
+    /**
+     * @return la case en fonction des coordonnées
+     */
     public Case getCaseAt(int ligne, int colonne) {
         Node node = null;
         for (Node child : plateau.getChildren()) {
@@ -350,40 +355,42 @@ public class Plateau extends Parent {
             return null;
         }
     }
-    public void moveServer(int unitID, int x, int y){
 
+    //Gere le changement de position d'une unite quand il vient d'un autre client
+    public void moveServer(int unitID, int x, int y){
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                Unite bouf = getUniteById(unitID);
-                bouf.deplacer(x, y);
-
-                // Obtient la case à la position (1, 1)
+                Unite unite = getUniteById(unitID);
+                unite.move(x, y);
                 Case caseCible = getCaseAt(x, y);
-                bouf.appliquerTerrain(caseCible);
-                // Met à jour les positions X et Y de l'unité en utilisant la position de la case
-                plateau.getChildren().remove(bouf.getCircle());
-                plateau.add(bouf.getCircle(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
-                bouf.setPositionX(GridPane.getRowIndex(caseCible));
-                bouf.setPositionY(GridPane.getColumnIndex(caseCible));
+                unite.appliquerTerrain(caseCible);
 
-                plateau.getChildren().remove(bouf.getVieText());
-                plateau.add(bouf.getVieText(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
-                bouf.updateVieTextPosition();
+                // Met à jour les positions X et Y de l'unité en utilisant la position de la case
+                plateau.getChildren().remove(unite.getCircle());
+                plateau.add(unite.getCircle(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
+                unite.setPositionX(GridPane.getRowIndex(caseCible));
+                unite.setPositionY(GridPane.getColumnIndex(caseCible));
+
+                plateau.getChildren().remove(unite.getVieText());
+                plateau.add(unite.getVieText(), GridPane.getRowIndex(caseCible), GridPane.getColumnIndex(caseCible));
+                unite.updateVieTextPosition();
             }
         });
     }
+
+    //Gère l'attaque quand elle vient d'un autre client
     public void attackServer(int attackId, int attackedId){
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
                 Unite uniteAttaquante = getUniteById(attackId);
                 Unite uniteCible = getUniteById(attackedId);
-                uniteAttaquante.attaquer(uniteCible);
+                uniteAttaquante.attack(uniteCible);
                 uniteCible.updateVieTextPosition();
-                if (uniteCible.estMort()) {
-                    String messageMort = "L'unité " + uniteCible.getNom() + " est morte";
-                    printNewMessage(new Message("Info", messageMort));
+                if (uniteCible.die()) {
+                    String messageMort = "L'unité " + uniteCible.getNom() + " est morte.";
+                    printNewMessage(new Message("Infos", messageMort));
                     plateau.getChildren().remove(uniteCible.getCircle());
                     plateau.getChildren().remove(uniteCible.getVieText());
                 }
@@ -398,6 +405,7 @@ public class Plateau extends Parent {
                 if (receivedText != null) {
                     text.setPrefWidth(receivedText.getPrefWidth() - 20);
                     text.setAlignment(Pos.CENTER_LEFT);
+                    text.setStyle("-fx-wrap-text: true;");
                     receivedText.getChildren().add(text);
                 }
             }
