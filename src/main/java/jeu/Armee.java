@@ -29,15 +29,26 @@ public class Armee {
     }
 
     public void ajouterUnite(Unite unite){
-        unite.setNumero(this.lesUnites.size());
+        //unite.setNumero(this.lesUnites.size());
         this.lesUnites.add(unite);
+        unite.setArmee(this);
     }
 
     public void enleverUnite(int numeroUnite){
         this.lesUnites.remove(numeroUnite);
     }
 
+
+    /**
+     * @return True si aucune unite est en vie
+     */
     public boolean encoreUnite(){
-        return this.lesUnites.size() == 0 ? false : true;
+        int result = 0;
+        for (Unite unite : this.lesUnites){
+            if(unite.getVie() <= 0){
+                result++;
+            }
+        }
+        return result == this.lesUnites.size() ? true : false;
     }
 }

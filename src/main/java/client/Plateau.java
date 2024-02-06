@@ -18,6 +18,7 @@ import jeu.Armee;
 import jeu.Case;
 import jeu.Unite;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Plateau extends Parent {
@@ -25,9 +26,9 @@ public class Plateau extends Parent {
     private int nbColonnes = 10;
     private int nbLigne = 10;
     private GridPane plateau;
-    private Unite uniteChoose;
+    private Unite uniteChoisie;
     private Unite uniteAttaquante;
-    private Armee armee;
+    private ArrayList<Unite> unitesJeu;
     private Client client;
     private ScrollPane scrollReceivedText;
     private TextFlow receivedText;
@@ -41,27 +42,26 @@ public class Plateau extends Parent {
     public GridPane initPlateau(Client client){
         this.client = client;
 
-        Armee armee = new Armee("T");
+        //Création des unitées et des armmées
+        this.unitesJeu = new ArrayList<>();
+        Armee armee = new Armee("Bleu");
         Unite unite1 = new Unite("Bob", 50, 20,2,1,1,1, Color.BLUE, 1, 2);
         Unite unite2 = new Unite("Bob", 50, 20,2,2,2,1, Color.BLUE, 1, 2);
         Unite unite3 = new Unite("Bob", 50, 20,2,3,1,2, Color.BLUE, 1, 2);
         Unite unite4 = new Unite("Bob", 50, 20,2,4,2,2, Color.BLUE, 1, 2);
-        Armee armee2 = new Armee("B");
+        Armee armee2 = new Armee("Rouge");
         Unite unite5 = new Unite("Bob", 50, 20,2,5,8,8, Color.RED, 1, 2);
         Unite unite6 = new Unite("Bob", 50, 20,2,6,9,8, Color.RED, 1, 2);
         Unite unite7 = new Unite("Bob", 50, 20,2,7,8,9, Color.RED, 1, 2);
         Unite unite8 = new Unite("Bob", 50, 20,2,8,9,9, Color.RED, 1, 2);
-        this.armee = armee;
         armee.ajouterUnite(unite1);
-        System.out.println("Avant : " + unite1.getDefense() + " " + unite1.getPositionX() + " " + unite1.getPositionY());
         armee.ajouterUnite(unite2);
         armee.ajouterUnite(unite3);
         armee.ajouterUnite(unite4);
-        armee.ajouterUnite(unite5);
-        armee.ajouterUnite(unite6);
-        armee.ajouterUnite(unite7);
-        armee.ajouterUnite(unite8);
-
+        armee2.ajouterUnite(unite5);
+        armee2.ajouterUnite(unite6);
+        armee2.ajouterUnite(unite7);
+        armee2.ajouterUnite(unite8);
 
         //Création du plateau
         for (int ligne = 0; ligne   < nbLigne ; ligne++){
@@ -70,10 +70,17 @@ public class Plateau extends Parent {
                     Case caseJeu = creerCase(ligne  , colonne);
                     this.plateau.add(caseJeu, colonne, ligne);
                     setMove(caseJeu, armee);
+                    setMove(caseJeu, armee2);
                 }
             }
         }
         for (Unite unite : armee.getLesUnites()){
+            this.unitesJeu.add(unite);
+            placerUnite(unite);
+            unite.appliquerTerrain(getCaseAt(unite.getPositionY(), unite.getPositionX()));
+        }
+        for (Unite unite : armee2.getLesUnites()){
+            this.unitesJeu.add(unite);
             placerUnite(unite);
             unite.appliquerTerrain(getCaseAt(unite.getPositionY(), unite.getPositionX()));
         }
@@ -204,51 +211,51 @@ public class Plateau extends Parent {
     }
 
     public void handleUniteClick(Unite unite){
-        if (this.uniteChoose != null){
-            this.uniteChoose.getCircle().setStroke(null);
+        if (this.uniteChoisie != null){
+            this.uniteChoisie.getCircle().setStroke(null);
         }
 
         unite.getCircle().setStroke(Color.BLUE);
-        this.uniteChoose = unite;
+        this.uniteChoisie = unite;
     }
 
     public void handleCaseClick(Case caseJeu){
-        if(this.uniteChoose != null){
-            if (this.uniteChoose.peuxdeplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu))){
-                this.uniteChoose.deplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
+        if(this.uniteChoisie != null){
+            if (this.uniteChoisie.peuxdeplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu))){
+                this.uniteChoisie.deplacer(GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
                 // Déplace l'unité vers la nouvelle case
-                this.plateau.getChildren().remove(this.uniteChoose.getCircle());
-                this.plateau.add(this.uniteChoose.getCircle(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
+                this.plateau.getChildren().remove(this.uniteChoisie.getCircle());
+                this.plateau.add(this.uniteChoisie.getCircle(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
 
                 // Met à jour la position de l'unité
-                this.uniteChoose.setPositionX(GridPane.getColumnIndex(caseJeu));
-                this.uniteChoose.setPositionY(GridPane.getRowIndex(caseJeu));
+                this.uniteChoisie.setPositionX(GridPane.getColumnIndex(caseJeu));
+                this.uniteChoisie.setPositionY(GridPane.getRowIndex(caseJeu));
 
                 // Met à jour la position du texte de la vie
-                this.uniteChoose.updateVieTextPosition();
+                this.uniteChoisie.updateVieTextPosition();
 
                 // Déplace le texte de la vie vers la nouvelle case
-                this.plateau.getChildren().remove(this.uniteChoose.getVieText());
-                this.plateau.add(this.uniteChoose.getVieText(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
+                this.plateau.getChildren().remove(this.uniteChoisie.getVieText());
+                this.plateau.add(this.uniteChoisie.getVieText(), GridPane.getColumnIndex(caseJeu), GridPane.getRowIndex(caseJeu));
 
-                this.uniteChoose.getCircle().setStroke(null);
+                this.uniteChoisie.getCircle().setStroke(null);
 
                 // Au clic sur le pion, envoie un message au serveur pour indiquer l'action
-                Message moveMessage = new Message("move",this.uniteChoose.getNumero() + "," + this.uniteChoose.getPositionX() + "," + this.uniteChoose.getPositionY());
+                Message moveMessage = new Message("move",this.uniteChoisie.getNumero() + "," + this.uniteChoisie.getPositionX() + "," + this.uniteChoisie.getPositionY());
                 this.client.sendMessage(moveMessage);
             }else {
-                String messageMort = "L'unité peux se déplacer d'uniquement " + uniteChoose.getPorteeDeplacement() + " cases";
+                String messageMort = "L'unité peux se déplacer d'uniquement " + uniteChoisie.getPorteeDeplacement() + " cases";
                 printNewMessage(new Message("Info", messageMort));
             }
-            uniteChoose.appliquerTerrain(caseJeu);
-            this.uniteChoose = null;
+            uniteChoisie.appliquerTerrain(caseJeu);
+            this.uniteChoisie = null;
         }
     }
 
     public void setMove(Case caseJeu, Armee armee) {
         for (Unite unite : armee.getLesUnites()) {
             caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu));
-            unite.getCircle().setOnMouseClicked(even -> {
+            unite.getCircle().setOnMouseClicked(event -> {
                 handleUniteClick(unite);
             });
         }
@@ -257,13 +264,13 @@ public class Plateau extends Parent {
     public void handleAttaqueButtonClick() {
         if (uniteAttaquante != null) {
             // L'unité attaquante a déjà été choisie, permet à l'utilisateur de choisir l'unité cible
-            for (Unite unite : armee.getLesUnites()) {
+            for (Unite unite : this.unitesJeu) {
                 unite.getCircle().setStroke(Color.BLACK);
                 unite.getCircle().setOnMouseClicked(event -> handleUniteCibleClick(unite));
             }
         } else {
             // Aucune unité attaquante n'a été choisie, permet à l'utilisateur de choisir l'unité attaquante
-            for (Unite unite : armee.getLesUnites()) {
+            for (Unite unite : this.unitesJeu) {
                 unite.getCircle().setStroke(Color.GREEN);
                 unite.getCircle().setOnMouseClicked(event -> handleUniteAttaquanteClick(unite));
             }
@@ -280,12 +287,12 @@ public class Plateau extends Parent {
     private void handleUniteCibleClick(Unite uniteCible) {
         // Annule la sélection de l'unité cible précédente (si applicable)
         uniteCible.getCircle().setStroke(null);
-        if (uniteAttaquante != null && uniteAttaquante.estDansPortee(uniteCible) && uniteAttaquante != uniteCible) {
+        if (uniteAttaquante != null && uniteAttaquante.estDansPortee(uniteCible) && uniteAttaquante != uniteCible && uniteAttaquante.getArmee() != uniteCible.getArmee()) {
             // Effectuez l'attaque avec l'unité attaquante et l'unité cible
             uniteAttaquante.attaquer(uniteCible);
             //Vérifie si l'unite est morte
             if (uniteCible.estMort()) {
-                String messageMort = "L'unité " + uniteCible.getNom() + " est morte";
+                String messageMort = "L'unité " + uniteCible.getNom() + " est morte.";
                 printNewMessage(new Message("Info", messageMort));
                 this.plateau.getChildren().remove(uniteCible.getCircle());
                 this.plateau.getChildren().remove(uniteCible.getVieText());
@@ -304,22 +311,25 @@ public class Plateau extends Parent {
             uniteCible.updateVieTextPosition();
         }else {
             // Gère le cas où l'unité cible est hors de portée
-            String  messageErreur = "L'unité cible est hors de portée ou ne peut pas se suicider!";
+            String  messageErreur = "Cible invalide ou hors de portée.";
             printNewMessage(new Message("Info", messageErreur));
             System.out.println(messageErreur);
         }
+        if (uniteCible.getArmee().encoreUnite()){
+            String  messageFin = "Parti terminée l'armée " + uniteAttaquante.getArmee().getNom() + " à remportée la parti.";
+            printNewMessage(new Message("Info", messageFin));
+        }
         // Réinitialise les sélections et les gestionnaires de clic
         uniteAttaquante = null;
-        for (Unite unite : armee.getLesUnites()) {
+        for (Unite unite : this.unitesJeu) {
             unite.getCircle().setStroke(null);
             unite.getCircle().setOnMouseClicked(event -> handleUniteClick(unite));
         }
     }
 
 
-
-    public Unite getUniteById(int unitID, Armee armee) {
-        for (Unite unite : armee.getLesUnites()) {
+    public Unite getUniteById(int unitID) {
+        for (Unite unite : this.unitesJeu) {
             if (unite.getNumero() == unitID) {
                 return unite;
             }
@@ -345,7 +355,7 @@ public class Plateau extends Parent {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                Unite bouf = getUniteById(unitID, armee);
+                Unite bouf = getUniteById(unitID);
                 bouf.deplacer(x, y);
 
                 // Obtient la case à la position (1, 1)
@@ -367,8 +377,8 @@ public class Plateau extends Parent {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
-                Unite uniteAttaquante = getUniteById(attackId, armee);
-                Unite uniteCible = getUniteById(attackedId, armee);
+                Unite uniteAttaquante = getUniteById(attackId);
+                Unite uniteCible = getUniteById(attackedId);
                 uniteAttaquante.attaquer(uniteCible);
                 uniteCible.updateVieTextPosition();
                 if (uniteCible.estMort()) {
