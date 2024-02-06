@@ -144,7 +144,7 @@ public class Unite {
         this.porteeDeplacement = porteeDeplacement;
     }
 
-    public void attaquer(Unite ennemie){
+    public void attack(Unite ennemie){
         int degat = 0;
         degat = this.attaque - ennemie.getDefense();
         if (ennemie.faiblesse(this)){
@@ -154,6 +154,9 @@ public class Unite {
         ennemie.perdreVie(trueDamage);
     }
 
+    /**
+     * @return True si l'unite ennemie est un archer
+     */
     public boolean faiblesse(Unite ennemie){
         boolean result = false;
         if (ennemie instanceof Archer && this instanceof Volant){
@@ -170,10 +173,11 @@ public class Unite {
     /**
      * @return True si l'unite est morte
      */
-    public boolean estMort(){
+    public boolean die(){
         return this.vie <= 0 ? true : false;
     }
 
+    //Applique un bonus ou un malus en fonction du terrain
     public void appliquerTerrain(Case casejeu){
         switch (casejeu.getNom()){
             case "plaine":
@@ -195,21 +199,26 @@ public class Unite {
         }
     }
 
-    public void deplacer(int nouvellePositionX, int nouvellePositionY) {
+    //Change les coordonées de l'unite
+    public void move(int nouvellePositionX, int nouvellePositionY) {
         this.positionX = nouvellePositionX;
         this.positionY = nouvellePositionY;
     }
     public void updateVieTextPosition() {
-        this.vieText.setX(this.positionX * 50); // Ajustez en fonction de la taille de la case
-        this.vieText.setY(this.positionY * 50); // Ajustez en fonction de la taille de la case
+        this.vieText.setX(this.positionX * 50);
+        this.vieText.setY(this.positionY * 50);
     }
-    public boolean estDansPortee(Unite autreUnite) {
+    public boolean inRange(Unite autreUnite) {
         int distanceX = Math.abs(this.getPositionX() - autreUnite.getPositionX());
         int distanceY = Math.abs(this.getPositionY() - autreUnite.getPositionY());
 
         return distanceX <= this.getPorteeAttaque() && distanceY <= this.getPorteeAttaque();
     }
-    public boolean peuxdeplacer(int nouvellePositionX, int nouvellePositionY){
+
+    /**
+     * @return True si case est dans la portée de déplacement de l'unité
+     */
+    public boolean canMove(int nouvellePositionX, int nouvellePositionY){
         int distanceX = Math.abs(this.getPositionX() - nouvellePositionX);
         int distanceY = Math.abs(this.getPositionY() - nouvellePositionY);
         return distanceX <= this.porteeDeplacement && distanceY <= this.porteeDeplacement;

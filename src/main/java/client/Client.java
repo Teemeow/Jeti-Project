@@ -30,12 +30,28 @@ public class Client {
             System.out.println(e);
         }
 
+        //Initialisation des threads d'envoie et de reception de messages
         Thread threadClientSend = new Thread(new ClientSend(this.out,this.socket));
         threadClientSend.start();
-
         Thread threadClientReceive = new Thread(new ClientReceive(this, this.socket));
         threadClientReceive.start();
 
+    }
+
+    public Plateau getPlateau() {
+        return plateau;
+    }
+
+    public void setPlateau(Plateau plateau) {
+        this.plateau = plateau;
+    }
+
+    public Acceuil getView() {
+        return view;
+    }
+
+    public void setView(Acceuil view) {
+        this.view = view;
     }
 
     public void disconnectedServer(){
@@ -52,11 +68,12 @@ public class Client {
     }
 
     public Message messageReceived(Message message){
-
         if (plateau != null && message.getContent().length() == 3){
+            //Cas ou le message sert pour transmettre les infos d'attaque
             List<Integer> infos =  getInfos(message.getContent());
             this.plateau.attackServer(infos.get(0), infos.get(1));
         } else if (this.plateau != null && message.getContent().length() <= 6){
+            //Cas ou le message sert pour transmettre les infos de deplacement
             List<Integer> infos =  getInfos(message.getContent());
             this.plateau.moveServer( infos.get(0), infos.get(1), infos.get(2));
         }else if (plateau != null){
@@ -74,43 +91,18 @@ public class Client {
         }
     }
 
+
+    /**
+     * @return une liste de Integer qui sont les données reçus dans le message
+     */
     public List<Integer> getInfos(String data){
         // Sépare la chaîne en parties en utilisant la virgule comme délimiteur
         String[] parts = data.split(",");
         List<Integer> infos = new ArrayList<Integer>();
-
-
         for (String d:parts) {
             int in = Integer.parseInt(d);
             infos.add(in);
         }
-        // Convertit les parties en entiers
-        //int numUnite = Integer.parseInt(parts[0]);
-        //int xCoordinate = Integer.parseInt(parts[1]);
-        //int yCoordinate = Integer.parseInt(parts[2]);
-//
-        //infos.add(numUnite);
-        //infos.add(xCoordinate);
-        //infos.add(yCoordinate);
-
         return infos;
-    }
-
-    public Plateau getPlateau() {
-        return plateau;
-    }
-
-    public void setPlateau(Plateau plateau) {
-        this.plateau = plateau;
-    }
-
-
-
-    public Acceuil getView() {
-        return view;
-    }
-
-    public void setView(Acceuil view) {
-        this.view = view;
     }
 }

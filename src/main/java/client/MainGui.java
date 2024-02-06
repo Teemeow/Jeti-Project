@@ -23,7 +23,6 @@ public class MainGui extends Application {
 
 
     public void acceuil(){
-
         String address = "127.0.0.1";
         int port = 1025;
 
