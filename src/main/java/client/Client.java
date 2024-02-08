@@ -15,7 +15,6 @@ public class Client {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private Acceuil view;
-
     private Plateau plateau;
 
 
