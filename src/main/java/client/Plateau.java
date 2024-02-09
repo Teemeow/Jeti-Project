@@ -68,22 +68,15 @@ public class Plateau extends Parent {
             for (int colonne = 0; colonne < nbColonnes; colonne++){
                 if (ligne != 0 && colonne != 0){
                     Case caseJeu = creerCase(ligne  , colonne);
+                    caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu));
                     this.plateau.add(caseJeu, colonne, ligne);
-                    setMove(caseJeu, armee);
-                    setMove(caseJeu, armee2);
                 }
             }
         }
-        for (Unite unite : armee.getLesUnites()){
-            this.unitesJeu.add(unite);
-            placerUnite(unite);
-            unite.appliquerTerrain(getCaseAt(unite.getPositionY(), unite.getPositionX()));
-        }
-        for (Unite unite : armee2.getLesUnites()){
-            this.unitesJeu.add(unite);
-            placerUnite(unite);
-            unite.appliquerTerrain(getCaseAt(unite.getPositionY(), unite.getPositionX()));
-        }
+        setUpUnite( armee);
+        setUpUnite( armee2);
+
+
         Button attaqueButton = new Button("Attaquer");
         attaqueButton.setOnAction(event -> handleAttaqueButtonClick());
         this.plateau.add(attaqueButton, 15, 4);
@@ -252,48 +245,48 @@ public class Plateau extends Parent {
         }
     }
 
-    //Configuration d'evenement pour les cases et unites
-    public void setMove(Case caseJeu, Armee armee) {
-        for (Unite unite : armee.getLesUnites()) {
-            caseJeu.setOnMouseClicked(event -> handleCaseClick(caseJeu));
+    //Configuration d'evenement pour l'unites et les places sur le plateau
+    public void setUpUnite(Armee armee) {
+        for (Unite unite : armee.getLesUnites()){
             unite.getCircle().setOnMouseClicked(event -> {
                 handleUniteClick(unite);
             });
+            this.unitesJeu.add(unite);
+            placerUnite(unite);
+            unite.appliquerTerrain(getCaseAt(unite.getPositionY(), unite.getPositionX()));
         }
     }
 
     //Gestion du clic sur le bouton attaquer
     public void handleAttaqueButtonClick() {
-        if (uniteAttaquante != null) {
-            // L'unité attaquante a déjà été choisie, permet à l'utilisateur de choisir l'unité cible
-            for (Unite unite : this.unitesJeu) {
-                unite.getCircle().setStroke(Color.BLACK);
-                unite.getCircle().setOnMouseClicked(event -> handleUniteCibleClick(unite));
-            }
-            String  messageInfos = "Choisissez l'unité qui va se faire attaquer.";
-            printNewMessage(new Message("Infos", messageInfos));
-        } else {
             // Aucune unité attaquante n'a été choisie permet à l'utilisateur de choisir l'unité attaquante
             for (Unite unite : this.unitesJeu) {
                 unite.getCircle().setStroke(Color.GREEN);
                 unite.getCircle().setOnMouseClicked(event -> handleUniteAttaquanteClick(unite));
             }
-            String  messageInfos = "Choisissez l'unité qui va attaquer, puis réappuyer sur le bouton d'attaque.";
+            String  messageInfos = "Choisissez l'unité qui va attaquer.";
             printNewMessage(new Message("Infos", messageInfos));
-        }
+
     }
 
     private void handleUniteAttaquanteClick(Unite unite) {
-        unite.getCircle().setStroke(null); // Annule la sélection de l'unité précédente (si applicable)
-        uniteAttaquante = unite;
+
+        this.uniteAttaquante = unite;
+        for (Unite unitej : this.unitesJeu) {
+            unitej.getCircle().setStroke(Color.BLACK);
+            unitej.getCircle().setOnMouseClicked(event -> handleUniteCibleClick(unitej));
+        }
         // Désactive la possibilité de choisir cette unité à nouveau
         unite.getCircle().setOnMouseClicked(null);
+        unite.getCircle().setStroke(null);
+
+        String  messageInfos = "Choisissez l'unité qui va se faire attaquer.";
+        printNewMessage(new Message("Infos", messageInfos));
+
     }
 
     //Gestion du clic sur une unite cible
     private void handleUniteCibleClick(Unite uniteCible) {
-        // Annule la sélection de l'unité cible précédente (si applicable)
-        uniteCible.getCircle().setStroke(null);
         if (uniteAttaquante != null && uniteAttaquante.inRange(uniteCible) && uniteAttaquante != uniteCible && uniteAttaquante.getArmee() != uniteCible.getArmee()) {
             uniteAttaquante.attack(uniteCible);
             if (uniteCible.die()) {
@@ -302,8 +295,6 @@ public class Plateau extends Parent {
                 this.plateau.getChildren().remove(uniteCible.getCircle());
                 this.plateau.getChildren().remove(uniteCible.getVieText());
             }
-            int positionX = uniteCible.getPositionX();
-            int positionY = uniteCible.getPositionY();
 
             Message attackMessage = new Message("attack", uniteAttaquante.getNumero() + "," + uniteCible.getNumero());
             this.client.sendMessage(attackMessage);
